@@ -1,14 +1,14 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState } from "react";
+
+/* eslint-disable react-refresh/only-export-components */
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
+  const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("user");
-    if (savedUser) setUser(JSON.parse(savedUser));
-  }, []);
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
   const signup = (email, password) => {
     const users = JSON.parse(localStorage.getItem("users")) || [];
@@ -16,7 +16,7 @@ export const AuthProvider = ({ children }) => {
     const exists = users.find(u => u.email === email);
     if (exists) {
       alert("User already exists");
-      return;
+      return false;
     }
 
     const newUser = { email, password };
@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }) => {
 
     localStorage.setItem("users", JSON.stringify(users));
     alert("Signup successful!");
+    return true;
   };
 
   const login = (email, password) => {
